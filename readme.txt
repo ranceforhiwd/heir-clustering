@@ -7,3 +7,6 @@ For Developer: docker run -d -it -v ${PWD}:/usr/run/py <imageName> tail -f
 - go the docker terminal
 - type below command 
 - python3 findAddresses.py
+
+* it will take pdf file name from statmechine input and process that input and save vocabulary, state
+* zip code information in to markup table in dynamo db
