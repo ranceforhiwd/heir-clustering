@@ -10,7 +10,7 @@ print(pdfFullPath)
 fileName = pdfFullPath.replace('"', '')
 
 # Below is for local test
-# fileName = './marinecopy321.pdf~06.png'
+# fileName = './marinecopy501.pdf~01.png'
 print(fileName)
 session = createSession(boto3)
 
@@ -38,6 +38,9 @@ for query_results in query_results_all:
     original = ''
     spaceList = []
     addresses = []
+    ycordNew = []
+    wordfNew = []
+    stepOne = []
     for x in pngRecord:
         if pngRecord[x].get('text'):
             xcoord.append(int(pngRecord[x].get('x')))
@@ -58,8 +61,8 @@ for query_results in query_results_all:
     var2 = createPlot(clusters[3])
  
     # Loop for annotation of all points
-    yValues = get_y_coordinates(var2,wcoord,ycoord,vocabulary)
-    # print(yValues)
+    yValues = get_y_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height)
+    
  
     mylist = list(dict.fromkeys(yValues))
     # print(mylist)
@@ -70,10 +73,13 @@ for query_results in query_results_all:
     addressDetails = preparteArrayWithCoordinatesBasedonWord(var2,mylist,ycoord,wcoord,xcoord, height, width)
 
     addressDetailsNew = validateAddress(addressDetails)
-    print(addressDetailsNew)
- 
+    # print(addressDetailsNew)
+
+    addressDetailsNew2 = validateAddress2(addressDetailsNew)
+    print(addressDetailsNew2)
+
     tableName = 'markup'
-    saveResultsInMarkupTable(session,addressDetailsNew,fileName,dbName, tableName,pngFile)
+    saveResultsInMarkupTable(session,addressDetailsNew2,fileName,dbName, tableName,pngFile)
 # add = chunk_address(addresses)
 # print(add)
  

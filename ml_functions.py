@@ -170,20 +170,24 @@ def check_clusters(c1,c2,wcoord,vocabulary,ycoord):
 #cluster -selected cluster
 #word - scanned word
 #ycoord - ycoordinates
-def get_y_coordinates(cluster,word, ycoord,vocabulary):
+def get_y_coordinates(cluster,word, ycoord,vocabulary, font_size_height):
     yValues = []
     #loop through the clusters
     for i in range(len(word)):
 
-        if  word[i] and word[i] in vocabulary  or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
-            # upper = ycoord[i] + font_size_height[i]
-            # lower = ycoord[i] - font_size_height[i]
+        if word[i] in vocabulary  or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
+        #if word[i] in vocabulary:
+            upper = ycoord[i] + font_size_height[i]
+            lower = ycoord[i] - font_size_height[i]
             # original = ycoord[i]
             # spaceList = [int(upper),int(lower),int(original)]
             thetype = type(word[i])
             isnumberic = word[i].isnumeric()
             print(word[i]+ ': ' + str(thetype) + str(isnumberic) + ': ' + str(ycoord[i])) 
             yValues.append(ycoord[i])
+            yValues.append(upper)
+            yValues.append(lower)
+            yValues.append(word[i])
     return yValues
 
 #function get addresses
@@ -304,6 +308,20 @@ def validateAddress(data):
 
     return data     
 
+#Validate final address second time
+def validateAddress2(data):
+    
+    for i in range(len(data)):
+        if i + 1 < len(data):
+            if checkZipCode(data[i][4]) == True:
+                
+                print(data[i][4])
+                if data[i - 1][4] in vocabulary or data[i + 1][4] in vocabulary or checkStates(str(data[i - 1][4])) == True or checkStates(str(data[i + 1][4])) == True:
+                    print('')
+                else:
+                    data.pop(i)
+ 
+    return data           
 
 
 
