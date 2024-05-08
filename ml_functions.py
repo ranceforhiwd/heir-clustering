@@ -264,7 +264,8 @@ def preparteArrayWithCoordinatesBasedonWord(cluster,yArr,ycoord,wcoord,xcoord,he
 
 #function save address results to markup table
 def saveResultsInMarkupTable(session,data,fileName,dbName, tblName,pngFile):
-    jsonData = format_add(data)
+    jsonData = format_add1(data)
+    
     dynamodb = session.resource('dynamodb')
     table = dynamodb.Table(dbName)
 
@@ -284,6 +285,24 @@ def saveResultsInMarkupTable(session,data,fileName,dbName, tblName,pngFile):
         print('Data save to DB!')
     else: 
         print('Error: DB Insertion Failed!')
+
+#create Json Object
+def format_add1(add):
+    #create an empty json object
+    json_address = json.loads('{}')
+    
+    #make an arry list using numpy
+    arr = np.array(add)
+    
+    #validate size of list
+    if len(add) > 0:
+        #loop thru the address object
+        for a in range(len(add)):
+            json_address['address_' + str(a)] = re.sub('[^A-Za-z0-9]+', '', arr[a,1]) +  ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,2]) + ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,4]) + ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,3]) + ' '+ re.sub('[^A-Za-z0-9]+', '', arr[a,0]) + ' '
+            
+    return json_address
+
+   
 
 #create Json Object
 def format_add(add):
@@ -351,19 +370,20 @@ def get_all_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord
             yValues1.append(ycoord[i])
             yValues1.append(width[i])
             yValues1.append(height[i])
+            yValues1.append(font_size_height[i])
             yValues.append(yValues1)
     return yValues
 
-def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
+def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width,font_size):
     yValues = []
     
     #loop through the clusters
     for i in range(len(word)):
         yValues1 = []
-        if word[i] in vocabulary  or checkZipCode(str(word[i])) == True:
+        if word[i] in vocabulary or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
         #if word[i] in vocabulary:
-            upper = ycoord[i] - font_size_height[i]
-            lower = ycoord[i] + font_size_height[i]
+            upper = ycoord[i] - font_size[i]
+            lower = ycoord[i] + font_size[i]
             
             thetype = type(word[i])
             isnumberic = word[i].isnumeric()
@@ -379,12 +399,12 @@ def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,
 
 def getAllupperwords(allCoordinates,yValues):
     upperwordList = []
+    
     for i in range(len(yValues)):
         uppder = yValues[i][5]
         lower = yValues[i][6]
         ycoord = yValues[i][2]
         
-
         for j in range(len(allCoordinates)):
             ycoordAllwords = allCoordinates[j][2]
             if allCoordinates[j][2] >= uppder and allCoordinates[j][2] <= ycoord:
@@ -403,5 +423,47 @@ def getAlllowerwords(allCoordinates,yValues):
                 lowerwordList.append(allCoordinates[j][0])
 
     return lowerwordList
+
+def checkAllUpperLinewordsBasedOnWord(allCoordinates,upper,ycoord):
+    status = False
+    
+    for j in range(len(allCoordinates)):
+        ycoordAllwords = allCoordinates[j][2]
+        if allCoordinates[j][2] >= upper and allCoordinates[j][2] <= ycoord:
+            if(allCoordinates[j][0] in vocabulary  or checkStates(str(allCoordinates[j][0])) == True):
+                status = True
+                break
+
+    return status
+
+def checkAllLowerLinewordsBasedOnWord(allCoordinates,lower,ycoord):
+    status = False
+    
+    for j in range(len(allCoordinates)):
+        ycoordAllwords = allCoordinates[j][2]
+        if allCoordinates[j][2] <= lower and allCoordinates[j][2] >= ycoord:
+            if(allCoordinates[j][0] in vocabulary  or checkStates(str(allCoordinates[j][0])) == True):
+                status = True
+                break
+
+    return status
+    
+    
             
+def filterYcoordinateData(yValues, allCoordinates):
+    
+    for i in range(len(yValues)):
+        if(i<len(yValues)):
+            word = yValues[i][0]
             
+            if checkZipCode(word) == True:
+                upper = yValues[i][5]
+                lower = yValues[i][6]
+                ycoord = yValues[i][2]
+                upperLineStatus = checkAllUpperLinewordsBasedOnWord(allCoordinates,upper,ycoord)
+                lowerLineStatus = checkAllLowerLinewordsBasedOnWord(allCoordinates,lower,ycoord)
+                if(upperLineStatus == False and lowerLineStatus == False):
+                    yValues.pop(i)
+    return yValues
+            
+                
