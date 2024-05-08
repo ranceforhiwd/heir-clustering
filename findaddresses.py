@@ -5,12 +5,12 @@ import json
 from boto3.dynamodb.conditions import Key, Attr
 import os
 #get the env variable
-pdfFullPath = os.environ["PNGFILENAME"]
+#pdfFullPath = os.environ["PNGFILENAME"]
 #print(pdfFullPath)
-fileName = pdfFullPath.replace('"', '')
+#fileName = pdfFullPath.replace('"', '')
 
 # Below is for local test
-#fileName = './inseptioncopy701.pdf~05.png'
+fileName = './inseptiondoc44.pdf~01.png'
 print(fileName)
 session = createSession(boto3)
 
@@ -62,16 +62,22 @@ for query_results in query_results_all:
  
     # var1 = createPlot(clusters[1])
     var2 = createPlot(clusters[3])
- 
+    a= get_y_coordinates(var2,wcoord, ycoord,vocabulary)
+    
     # Loop for annotation of all points
     yValues = get_y_coordinates2(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width,font_size)
+   
+    
     allCoordinates = get_all_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width)
+    print(yValues)
+    exit()
     filteredResult = filterYcoordinateData(yValues,allCoordinates)
     
     #mylist = list(dict.fromkeys(filteredResult))
     #print(mylist)
     tableName = 'markup'
-    saveResultsInMarkupTable(session,filteredResult,fileName,dbName, tableName,pngFile)
+    
+    #saveResultsInMarkupTable(session,filteredResult,fileName,dbName, tableName,pngFile)
     exit()
     
     

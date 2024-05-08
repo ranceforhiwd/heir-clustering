@@ -71,6 +71,7 @@ def checkZipCode(code):
 
 #function to check street name
 def checkStreetName(street):
+    print(street)
     street_add = re.compile('^.*?\s[N]{0,1}([-a-zA-Z0-9]+)\s*\w*$')
     #validate street name
     if street_add.search(street):
@@ -165,12 +166,29 @@ def check_clusters(c1,c2,wcoord,vocabulary,ycoord):
         #return found coordinates and cluster 2 data
         return [clusterData2,c2[0]]
 
+
+def get_y_coordinates(cluster,word, ycoord,vocabulary):
+    yValues = []
+    #loop through the clusters
+    for i in range(len(word)):
+
+        if  word[i] and word[i] in vocabulary  or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
+            # upper = ycoord[i] + font_size_height[i]
+            # lower = ycoord[i] - font_size_height[i]
+            # original = ycoord[i]
+            # spaceList = [int(upper),int(lower),int(original)]
+            thetype = type(word[i])
+            isnumberic = word[i].isnumeric()
+            print(word[i]+ ': ' + str(thetype) + str(isnumberic) + ': ' + str(ycoord[i])) 
+            yValues.append(ycoord[i])
+    return yValues
+
 #functions get the y coordinates
 #params 
 #cluster -selected cluster
 #word - scanned word
 #ycoord - ycoordinates
-def get_y_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
+def get_y_coordinates3(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
     yValues = []
     print(ycoord)
     #loop through the clusters
@@ -380,8 +398,8 @@ def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,
     #loop through the clusters
     for i in range(len(word)):
         yValues1 = []
-        if word[i] in vocabulary or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
-        #if word[i] in vocabulary:
+        if word[i] and word[i] in vocabulary or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
+            
             upper = ycoord[i] - font_size[i]
             lower = ycoord[i] + font_size[i]
             
