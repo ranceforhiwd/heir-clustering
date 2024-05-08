@@ -170,24 +170,26 @@ def check_clusters(c1,c2,wcoord,vocabulary,ycoord):
 #cluster -selected cluster
 #word - scanned word
 #ycoord - ycoordinates
-def get_y_coordinates(cluster,word, ycoord,vocabulary, font_size_height):
+def get_y_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
     yValues = []
+    print(ycoord)
     #loop through the clusters
     for i in range(len(word)):
-
-        if word[i] in vocabulary  or checkStates(str(word[i])) == True or checkZipCode(str(word[i])) == True or checkStreetName(str(word[i])) == True:
+        yValues1 = []
+        if word[i] in vocabulary  or checkZipCode(str(word[i])) == True:
         #if word[i] in vocabulary:
             upper = ycoord[i] + font_size_height[i]
             lower = ycoord[i] - font_size_height[i]
-            # original = ycoord[i]
-            # spaceList = [int(upper),int(lower),int(original)]
+            print(upper)
+            exit()
             thetype = type(word[i])
             isnumberic = word[i].isnumeric()
-            print(word[i]+ ': ' + str(thetype) + str(isnumberic) + ': ' + str(ycoord[i])) 
-            yValues.append(ycoord[i])
-            yValues.append(upper)
-            yValues.append(lower)
-            yValues.append(word[i])
+            yValues1.append(word[i])
+            yValues1.append(xcoord[i])
+            yValues1.append(ycoord[i])
+            yValues1.append(width[i])
+            yValues1.append(height[i])
+            yValues.append(yValues1)
     return yValues
 
 #function get addresses
@@ -315,14 +317,91 @@ def validateAddress2(data):
         if i + 1 < len(data):
             if checkZipCode(data[i][4]) == True:
                 
-                print(data[i][4])
+                #print(data[i][4])
                 if data[i - 1][4] in vocabulary or data[i + 1][4] in vocabulary or checkStates(str(data[i - 1][4])) == True or checkStates(str(data[i + 1][4])) == True:
                     print('')
                 else:
                     data.pop(i)
  
-    return data           
+    return data  
 
+def checkXcoordinates(data,wcoord,xcoord):
+    foundedXcoordinates = []
+    for i in range(len(data)):
+        word = data[i][0]
+        xcord = data[i][1]
+        ycord = data[i][2]
+        for c in range(len(xcoord)):
+            if(xcord == xcoord[c]):
+                foundedXcoordinates.append(c)
 
+    return foundedXcoordinates
 
+def get_all_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
+    yValues = []
+    
+    #loop through the clusters
+    for i in range(len(word)):
+        yValues1 = []
+        if word[i]:
+            thetype = type(word[i])
+            isnumberic = word[i].isnumeric()
+            yValues1.append(word[i])
+            yValues1.append(xcoord[i])
+            yValues1.append(ycoord[i])
+            yValues1.append(width[i])
+            yValues1.append(height[i])
+            yValues.append(yValues1)
+    return yValues
 
+def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
+    yValues = []
+    
+    #loop through the clusters
+    for i in range(len(word)):
+        yValues1 = []
+        if word[i] in vocabulary  or checkZipCode(str(word[i])) == True:
+        #if word[i] in vocabulary:
+            upper = ycoord[i] - font_size_height[i]
+            lower = ycoord[i] + font_size_height[i]
+            
+            thetype = type(word[i])
+            isnumberic = word[i].isnumeric()
+            yValues1.append(word[i])
+            yValues1.append(xcoord[i])
+            yValues1.append(ycoord[i])
+            yValues1.append(width[i])
+            yValues1.append(height[i])
+            yValues1.append(upper)
+            yValues1.append(lower)
+            yValues.append(yValues1)
+    return yValues
+
+def getAllupperwords(allCoordinates,yValues):
+    upperwordList = []
+    for i in range(len(yValues)):
+        uppder = yValues[i][5]
+        lower = yValues[i][6]
+        ycoord = yValues[i][2]
+        
+
+        for j in range(len(allCoordinates)):
+            ycoordAllwords = allCoordinates[j][2]
+            if allCoordinates[j][2] >= uppder and allCoordinates[j][2] <= ycoord:
+                upperwordList.append(allCoordinates[j][0])
+    return upperwordList
+
+def getAlllowerwords(allCoordinates,yValues):
+    lowerwordList = []
+    for i in range(len(yValues)):
+        uppder = yValues[i][5]
+        lower = yValues[i][6]
+        ycoord = yValues[i][2]
+        for j in range(len(allCoordinates)):
+            ycoordAllwords = allCoordinates[j][2]
+            if allCoordinates[j][2] <= lower and allCoordinates[j][2] >= ycoord:
+                lowerwordList.append(allCoordinates[j][0])
+
+    return lowerwordList
+            
+            

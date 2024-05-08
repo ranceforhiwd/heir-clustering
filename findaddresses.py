@@ -5,12 +5,12 @@ import json
 from boto3.dynamodb.conditions import Key, Attr
 import os
 #get the env variable
-pdfFullPath = os.environ["PNGFILENAME"]
-print(pdfFullPath)
-fileName = pdfFullPath.replace('"', '')
+#pdfFullPath = os.environ["PNGFILENAME"]
+#print(pdfFullPath)
+#fileName = pdfFullPath.replace('"', '')
 
 # Below is for local test
-# fileName = './marinecopy501.pdf~01.png'
+fileName = './inseptioncopy701.pdf~05.png'
 print(fileName)
 session = createSession(boto3)
 
@@ -50,18 +50,28 @@ for query_results in query_results_all:
             font_size.append(pngRecord[x].get('font_size_px'))
             font_size_height.append(pngRecord[x].get('font_size_height_px'))
             wcoord.append(pngRecord[x].get('text'))
- 
+
     #vocabulary list
     vocabulary = ['Street', 'state', 'zipcode', 'Road','Ave.,', 'Boulevard', 'route', 'PO', 'Box', 'APT', 'Lane', 'Round', 'Circle']
  
     data = list(zip(xcoord, ycoord))
     clusters = makeClusters(data, 2)
- 
+
     # var1 = createPlot(clusters[1])
     var2 = createPlot(clusters[3])
  
     # Loop for annotation of all points
-    yValues = get_y_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height)
+    yValues = get_y_coordinates2(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width)
+    allCoordinates = get_all_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width)
+    print("UpperList")
+    uppderList = getAllupperwords(allCoordinates,yValues)
+    print(uppderList)
+    print("LoserList")
+    lowerList = getAlllowerwords(allCoordinates,yValues)
+    print(lowerList)
+    exit()
+    for w in range(len(dd)):
+        print(wcoord[dd[w]])
     
  
     mylist = list(dict.fromkeys(yValues))
@@ -77,7 +87,7 @@ for query_results in query_results_all:
 
     addressDetailsNew2 = validateAddress2(addressDetailsNew)
     print(addressDetailsNew2)
-
+    exit()
     tableName = 'markup'
     saveResultsInMarkupTable(session,addressDetailsNew2,fileName,dbName, tableName,pngFile)
 # add = chunk_address(addresses)
