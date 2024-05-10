@@ -15,7 +15,7 @@ newXcoord=[]
 newYcoord=[]
 newWcoord=[]
 #vocabulary list
-vocabulary = ['Street', 'state', 'zipcode', 'Road','Ave.,', 'Boulevard', 'route', 'PO', 'Box', 'APT', 'Lane']
+vocabulary = ['Street', 'state', 'zipcode', 'Road','Ave.,', 'Boulevard', 'route', 'PO', 'Box', 'APT', 'Lane', 'Round', 'Circle']
 
 
 def createPlot(c):
@@ -71,7 +71,7 @@ def checkZipCode(code):
 
 #function to check street name
 def checkStreetName(street):
-    print(street)
+    #print(street)
     street_add = re.compile('^.*?\s[N]{0,1}([-a-zA-Z0-9]+)\s*\w*$')
     #validate street name
     if street_add.search(street):
@@ -179,7 +179,7 @@ def get_y_coordinates(cluster,word, ycoord,vocabulary):
             # spaceList = [int(upper),int(lower),int(original)]
             thetype = type(word[i])
             isnumberic = word[i].isnumeric()
-            print(word[i]+ ': ' + str(thetype) + str(isnumberic) + ': ' + str(ycoord[i])) 
+            #print(word[i]+ ': ' + str(thetype) + str(isnumberic) + ': ' + str(ycoord[i])) 
             yValues.append(ycoord[i])
     return yValues
 
@@ -190,7 +190,7 @@ def get_y_coordinates(cluster,word, ycoord,vocabulary):
 #ycoord - ycoordinates
 def get_y_coordinates3(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width):
     yValues = []
-    print(ycoord)
+    #print(ycoord)
     #loop through the clusters
     for i in range(len(word)):
         yValues1 = []
@@ -198,8 +198,8 @@ def get_y_coordinates3(cluster,word, ycoord,vocabulary, font_size_height,xcoord,
         #if word[i] in vocabulary:
             upper = ycoord[i] + font_size_height[i]
             lower = ycoord[i] - font_size_height[i]
-            print(upper)
-            exit()
+            #print(upper)
+            
             thetype = type(word[i])
             isnumberic = word[i].isnumeric()
             yValues1.append(word[i])
@@ -281,7 +281,7 @@ def preparteArrayWithCoordinatesBasedonWord(cluster,yArr,ycoord,wcoord,xcoord,he
     return addressDetails
 
 #function save address results to markup table
-def saveResultsInMarkupTable(session,data,fileName,dbName, tblName,pngFile):
+def saveResultsInMarkupTable_bk(session,data,fileName,dbName, tblName,pngFile):
     jsonData = format_add1(data)
     
     dynamodb = session.resource('dynamodb')
@@ -319,8 +319,6 @@ def format_add1(add):
             json_address['address_' + str(a)] = re.sub('[^A-Za-z0-9]+', '', arr[a,1]) +  ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,2]) + ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,4]) + ' ' + re.sub('[^A-Za-z0-9]+', '', arr[a,3]) + ' '+ re.sub('[^A-Za-z0-9]+', '', arr[a,0]) + ' '
             
     return json_address
-
-   
 
 #create Json Object
 def format_add(add):
@@ -392,7 +390,7 @@ def get_all_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord
             yValues.append(yValues1)
     return yValues
 
-def get_y_coordinates2(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width,font_size):
+def vocabulary_y_coordinates(cluster,word, ycoord,vocabulary, font_size_height,xcoord,height,width,font_size):
     yValues = []
     
     #loop through the clusters
@@ -466,9 +464,43 @@ def checkAllLowerLinewordsBasedOnWord(allCoordinates,lower,ycoord):
 
     return status
     
-    
-            
+
 def filterYcoordinateData(yValues, allCoordinates):
+    voc = []
+    j = []
+    
+    for x in yValues:
+        voc.append(x[2])
+
+    for i in allCoordinates:
+        if i[2] in voc:
+            j.append([i[0], i[1], i[2], i[3], i[4]])
+
+    return j
+
+def saveResultsInMarkupTable(session,data,fileName,dbName, tblName,pngFile):
+    #jsonData = format_add1(data)
+    
+    dynamodb = session.resource('dynamodb')
+    table = dynamodb.Table(dbName)
+
+    #set the appraisal table
+    appraisalTbl = dynamodb.Table(tblName)
+    if len(data) > 0:
+        #save item to db
+        appraisalTbl.put_item(
+            Item={
+                    'pngname_pk': 'pngname_pk',
+                    'pngname_sk': 'pngname_pk-'+pngFile,
+                    'png_file_name': pngFile,
+                    'pdf_file_name': fileName,
+                    'json_data': data
+                }
+            )
+        print('Data save to DB!')
+    else: 
+        print('Error: DB Insertion Failed!')            
+def filterYcoordinateData_bk(yValues, allCoordinates):
     
     for i in range(len(yValues)):
         if(i<len(yValues)):

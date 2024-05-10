@@ -5,13 +5,13 @@ import json
 from boto3.dynamodb.conditions import Key, Attr
 import os
 #get the env variable
-#pdfFullPath = os.environ["PNGFILENAME"]
+pdfFullPath = os.environ["PNGFILENAME"]
 #print(pdfFullPath)
-#fileName = pdfFullPath.replace('"', '')
+fileName = pdfFullPath.replace('"', '')
 
 # Below is for local test
-fileName = './inseptiondoc44.pdf~01.png'
-print(fileName)
+#fileName = './inseptiondoc44.pdf~01.png'
+#print(fileName)
 session = createSession(boto3)
 
 dbName = 'scan_pdf_content2'
@@ -57,52 +57,51 @@ for query_results in query_results_all:
  
     data = list(zip(xcoord, ycoord))
     clusters = makeClusters(data, 2)
-
-    
- 
+     
     # var1 = createPlot(clusters[1])
     var2 = createPlot(clusters[3])
-    a= get_y_coordinates(var2,wcoord, ycoord,vocabulary)
-    
-    # Loop for annotation of all points
-    yValues = get_y_coordinates2(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width,font_size)
+    #a= get_y_coordinates(var2,wcoord, ycoord,vocabulary)
    
-    
+    # Loop for annotation of all points
+    vYvalues = vocabulary_y_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width,font_size)
+    #print(vYvalues)
+    #exit()
     allCoordinates = get_all_coordinates(var2,wcoord,ycoord,vocabulary, font_size_height,xcoord,height,width)
-    print(yValues)
-    exit()
-    filteredResult = filterYcoordinateData(yValues,allCoordinates)
+    #print(allCoordinates)
     
+    filteredResult = filterYcoordinateData(vYvalues,allCoordinates)
+    print(filteredResult)
+    #exit()
     #mylist = list(dict.fromkeys(filteredResult))
     #print(mylist)
     tableName = 'markup'
     
-    #saveResultsInMarkupTable(session,filteredResult,fileName,dbName, tableName,pngFile)
-    exit()
+    saveResultsInMarkupTable(session,filteredResult,fileName,dbName, tableName,pngFile)
+    #exit()
     
     
     
-    uppderList = getAllupperwords(allCoordinates,yValues)
+    #uppderList = getAllupperwords(allCoordinates,yValues)
    
-    lowerList = getAlllowerwords(allCoordinates,yValues)
-    print(lowerList)
-    exit()
+    #lowerList = getAlllowerwords(allCoordinates,yValues)
+    #print(lowerList)
+    #exit()
     #mylist = list(dict.fromkeys(yValues))
-    print(mylist)
-    exit()
-    addresses = get_addresses(var2,mylist,ycoord,wcoord)
-    print(addresses)
+    #print(mylist)
+    #exit()
+    #addresses = get_addresses(var2,mylist,ycoord,wcoord)
+    #print(addresses)
     
-    addressDetails = preparteArrayWithCoordinatesBasedonWord(var2,mylist,ycoord,wcoord,xcoord, height, width)
+    #addressDetails = preparteArrayWithCoordinatesBasedonWord(var2,mylist,ycoord,wcoord,xcoord, height, width)
 
-    addressDetailsNew = validateAddress(addressDetails)
+    #addressDetailsNew = validateAddress(addressDetails)
     # print(addressDetailsNew)
 
-    addressDetailsNew2 = validateAddress2(addressDetailsNew)
-    print(addressDetailsNew2)
-    exit()
-    tableName = 'markup'
-    saveResultsInMarkupTable(session,addressDetailsNew2,fileName,dbName, tableName,pngFile)
+    #addressDetailsNew2 = validateAddress2(addressDetailsNew)
+    #print(addressDetailsNew2)
+    #exit()
+    #tableName = 'markup'
+    #saveResultsInMarkupTable(session,addressDetailsNew2,fileName,dbName, tableName,pngFile)
 # add = chunk_address(addresses)
 # print(add)
  
