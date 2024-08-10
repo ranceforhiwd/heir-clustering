@@ -1,3 +1,4 @@
+#The example from WcSchools Into to ML
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import AgglomerativeClustering
